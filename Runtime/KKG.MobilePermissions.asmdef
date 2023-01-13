@@ -1,0 +1,23 @@
+{
+    "name": "KKG.MobilePermissions",
+    "rootNamespace": "",
+    "references": [
+        "GUID:edbf523d14333714993888c07077ee3f",
+        "GUID:b37a996d8a6e64540815cd7c056b89a5"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "2021.1",
+            "define": "USE_NEW_APIS"
+        }
+    ],
+    "noEngineReferences": false
+}

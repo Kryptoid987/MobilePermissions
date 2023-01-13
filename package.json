@@ -1,0 +1,36 @@
+{
+  "name": "com.kkg.mobilepermissions",
+  "version": "1.0.0",
+  "displayName": "Mobile Permissions",
+  "description": "A permission plugin to easily deal with Android and iOS permissions.",
+  "contributors": [
+    {
+      "name": "Patched Reality Inc",
+      "url": "https://bitbucket.org/patchedreality/unitypermissionshelperplugin/src/master/"
+    }
+  ],
+  "unity": "2021.1",
+  "dependencies": {},
+  "keywords": [
+    "mobile",
+    "permissions"
+  ],
+  "samples": [
+    {
+      "displayName": "Open App Settings Example",
+      "path": "OpenIOSAppSettingsPlugin/Samples~"
+    },
+    {
+      "displayName": "iOS Permissions Examples",
+      "path": "PatchedReality_PermissionHelper_Modified/Samples~"
+    }
+  ],
+  "author": {
+    "name": "Scott Vander Pryt",
+    "email": "kryptoid98@gmail.com",
+    "url": "https://www.youtube.com/channel/UCqzzogkft4PQc2VUB521vUw"
+  }
+}
+
+
+

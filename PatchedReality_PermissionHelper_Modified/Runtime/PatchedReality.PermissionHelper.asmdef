@@ -1,0 +1,23 @@
+{
+    "name": "PatchedReality.PermissionHelper",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [
+        "Editor",
+        "iOS"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "2021.1",
+            "define": "USE_NEW_APIS"
+        }
+    ],
+    "noEngineReferences": false
+}
