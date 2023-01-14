@@ -24,7 +24,7 @@ namespace MobilePermissions
         Authorized,
         Restricted,
         Denied,
-        DeniedForever,
+        DeniedForever, 
         Unknown
     }
 
@@ -44,12 +44,7 @@ namespace MobilePermissions
         //Android permissions
         PermissionCallbacks callbacks;
 #endif
-        //iOS permissions
-        bool waitForPermissionInput = false; //For iOS when auth state is unknown, so we can check on app focus if there authorized
-
-        Action<AuthStatus> OnPermissionChanged; 
-
-
+        Action<AuthStatus> OnPermissionChangedCallback; 
 
         public static AuthStatus HasPermission(PermissionType permission)
         {
@@ -106,26 +101,27 @@ namespace MobilePermissions
             AppSettingsIOSNativeBindings.OpenSettings();
 #endif
         }
-
-        #region Android
-        /// <summary>
-        /// Android Only Call
-        /// </summary>
-        public void RequestAndroidPermission(PermissionType permissionType, Action<AuthStatus> OnPermissionChanged)
+        public void RequestAndroidPermission(PermissionType permissionType, Action<AuthStatus> OnPermissionChangedCallback)
         {
-#if UNITY_ANDROID
-            this.OnPermissionChanged = OnPermissionChanged;
+#if UNITY_ANDROID || UNITY_IOS
+            this.OnPermissionChangedCallback = OnPermissionChangedCallback;
+#endif
 
+#if UNITY_ANDROID
             callbacks = new PermissionCallbacks();
             callbacks.PermissionGranted += Callbacks_AndroidPermissionGranted;
             callbacks.PermissionDenied += Callbacks_AndroidPermissionDenied;
             callbacks.PermissionDeniedAndDontAskAgain += Callbacks_PermissionDeniedAndDontAskAgain;
             Permission.RequestUserPermission(GetAndroidPermissionString(permissionType), callbacks);
+#elif UNITY_IOS
+            PermissionsHelperPlugin.Instance.RequestPermission(GetiOSPermissionEnum(permissionType));
+            PermissionsHelperPlugin.OnPermissionStatusUpdated += OniOSPermissionUpdated;
 #else
-            OnPermissionChanged?.Invoke(AuthStatus.Unknown);
+            OnPermissionChangedCallback?.Invoke(AuthStatus.Unknown);
 #endif
         }
 
+        #region Android
         private static string GetAndroidPermissionString(PermissionType type)
         {
             return type switch
@@ -136,24 +132,23 @@ namespace MobilePermissions
             };
         }
 
-        #region PermissionCallbacks Android
         //Enable pedometer after being granted the proper android permissions
         private void Callbacks_AndroidPermissionGranted(string obj)
         {
-            OnPermissionChanged?.Invoke(AuthStatus.Authorized);
+            OnPermissionChangedCallback?.Invoke(AuthStatus.Authorized);
             UnsubAndroidCallbacks();
         }
 
         //Log error and possibly react to needed permissions being denied;
         private void Callbacks_AndroidPermissionDenied(string obj)
         {
-            OnPermissionChanged?.Invoke(AuthStatus.Denied);
+            OnPermissionChangedCallback?.Invoke(AuthStatus.Denied);
             UnsubAndroidCallbacks();
         }
 
         private void Callbacks_PermissionDeniedAndDontAskAgain(string obj)
         {
-            OnPermissionChanged?.Invoke(AuthStatus.DeniedForever);
+            OnPermissionChangedCallback?.Invoke(AuthStatus.DeniedForever);
             UnsubAndroidCallbacks();
         }
 
@@ -170,13 +165,11 @@ namespace MobilePermissions
         }
 #endregion
 
-#endregion
-
-#region iOS
-        public void WaitForPermissionInput(Action<AuthStatus> OnPermissionChanged)
+        #region iOS
+        private void OniOSPermissionUpdated(PermissionsHelperPlugin.PermissionType permisson, bool success)
         {
-            this.OnPermissionChanged = OnPermissionChanged;
-            waitForPermissionInput = true;
+            PermissionsHelperPlugin.OnPermissionStatusUpdated -= OniOSPermissionUpdated;
+            OnPermissionChangedCallback?.Invoke(success ? AuthStatus.Authorized : AuthStatus.DeniedForever);
         }
 
 #if UNITY_IOS
@@ -190,23 +183,14 @@ namespace MobilePermissions
             };
         }
 #endif
-        private void OnApplicationFocus(bool focus)
-        {
-            //#if UNITY_IOS
-            //if (focus && waitForPermissionInput)
-            //{
-            //    waitForPermissionInput = false;
-            //    var result = HasPermissions() == AuthStatus.Authorized;
-            //    OnPermissionChanged?.Invoke(result);
-
-            //}
-            //#endif
-        }
 #endregion
 
         private void OnDestroy()
         {
             UnsubAndroidCallbacks();
+#if UNITY_IOS
+            PermissionsHelperPlugin.OnPermissionStatusUpdated -= OniOSPermissionUpdated;
+#endif
         }
     }
 }
