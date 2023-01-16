@@ -7,4 +7,5 @@ Any android permissions used must be added to AndroidManifest:
 <uses-permission android:name="android.permission.CAMERA"/> //Camera
 Note: Basic permissions like camera do not need to be manually added to AndroidManifest.
 
-iOS must have permission strings set for permission requests to work.
+-iOS must have permission strings set for permission requests to work.
+-Be sure to set Motion Usage to true in InputSystemPackages in settings if using new input system and require Motion Usage.

@@ -75,13 +75,8 @@ namespace MobilePermissions.iOS
             //note: same deal with motion usage
             else if (permission.Equals(PermissionType.PRMotionUsagePermissions))
             {
-                //var test = Input.acceleration.magnitude;
-
-                //if stepcounter.current = null, not supported, return denied. Do error not supported
-
-                UnityEngine.InputSystem.InputSystem.EnableDevice(UnityEngine.InputSystem.StepCounter.current);
-
-
+                RequestMotionPermissions();
+                return;
             }
 
             _requestPermission((int)permission, this.gameObject.name, "PermissionRequestSuccess", "PermissionRequestFailure");
@@ -118,11 +113,34 @@ namespace MobilePermissions.iOS
             Debug.LogError("New Input System currently cannot enable location services which is required to get the permission request prompt to actually show up for location. Returning failure.");
             this.PermissionRequestFailure(((int)PermissionType.PRLocationWhileUsingPermissions).ToString());
             return;
-#endif
+#else
 
             //otherwise, have our little location helper find out whats what.
             LocationHelper.RequestLocationPermissions(this.PermissionRequestSuccess, this.PermissionRequestFailure);
+#endif
         }
+
+        void RequestMotionPermissions()
+        {
+
+            PermissionStatus currStatus = this.GetPermissionStatus(PermissionType.PRMotionUsagePermissions);
+            if (currStatus.Equals(PermissionStatus.PRPermissionStatusDenied) || currStatus.Equals(PermissionStatus.PRPermissionStatusRestricted))
+            {
+                //fail immediately, no reason to bother checking.
+                this.PermissionRequestFailure(((int)PermissionType.PRMotionUsagePermissions).ToString());
+                return;
+            }
+            else if (currStatus.Equals(PermissionStatus.PRPermissionStatusAuthorized))
+            {
+                //succeed immediately, they have already granted what we need.
+                this.PermissionRequestSuccess(((int)PermissionType.PRMotionUsagePermissions).ToString());
+                return;
+            }
+
+            //otherwise, have our little location helper find out whats what.
+            MotionHelper.RequestMotionPermissions(this.PermissionRequestSuccess, this.PermissionRequestFailure);
+        }
+
         void PermissionRequestSuccess(string permissionType)
         {
             int permAsInt;
@@ -168,6 +186,27 @@ namespace MobilePermissions.iOS
             }
         }
         LocationChecker locationHelper;
+
+        MotionChecker MotionHelper
+        {
+            get
+            {
+                if (motionHelper == null)
+                {
+                    motionHelper = GetComponentInChildren<MotionChecker>();
+                    if (motionHelper == null)
+                    {
+                        //then make it.
+                        GameObject go = new GameObject("MotionPermissionChecker");
+                        go.transform.SetParent(this.transform);
+                        motionHelper = go.AddComponent<MotionChecker>();
+
+                    }
+                }
+                return motionHelper;
+            }
+        }
+        MotionChecker motionHelper;
 
 #if UNITY_IOS && !UNITY_EDITOR
         [DllImport ("__Internal")]
