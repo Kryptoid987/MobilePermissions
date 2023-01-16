@@ -16,6 +16,8 @@ namespace MobilePermissions
     public enum PermissionType
     {
         Camera,
+        Microphone,
+        Location,
         Pedometer,
     }
 
@@ -30,6 +32,9 @@ namespace MobilePermissions
 
     // NOTE ANDROID: This must be in the android manifest to use
     //<uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/> //Pedometer
+    //<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/> //Location
+    //<uses-permission android:name="android.permission.RECORD_AUDIO"/> //Microphone
+    //<uses-permission android:name="android.permission.CAMERA"/> //Camera
 
     // NOTE ANDROID: Permission prompt on device:
     // Allow Always = 'Allow Always'
@@ -144,6 +149,8 @@ namespace MobilePermissions
             {
                 PermissionType.Camera => "android.permission.CAMERA",
                 PermissionType.Pedometer => "android.permission.ACTIVITY_RECOGNITION",
+                PermissionType.Microphone => "android.permission.RECORD_AUDIO",
+                PermissionType.Location => "android.permission.ACCESS_FINE_LOCATION",
                 _ => throw new ArgumentOutOfRangeException(type.ToString() + " not a proper type"),
             };
         }
@@ -185,6 +192,7 @@ namespace MobilePermissions
 #endregion
 
         #region iOS
+#if UNITY_IOS
         private void OniOSPermissionUpdated(PermissionsHelperPlugin.PermissionType permisson, bool success)
         {
             PermissionsHelperPlugin.OnPermissionStatusUpdated -= OniOSPermissionUpdated;
@@ -192,13 +200,14 @@ namespace MobilePermissions
             OnPermissionChangedCallback?.Invoke(success ? AuthStatus.Authorized : AuthStatus.DeniedForever);
         }
 
-#if UNITY_IOS
         private static PermissionsHelperPlugin.PermissionType GetiOSPermissionEnum(PermissionType permissionType)
         {
             return permissionType switch
             {
                 PermissionType.Camera => PermissionsHelperPlugin.PermissionType.PRCameraPermissions,
                 PermissionType.Pedometer => PermissionsHelperPlugin.PermissionType.PRMotionUsagePermissions,
+                PermissionType.Microphone => PermissionsHelperPlugin.PermissionType.PRMicrophonePermissions,
+                PermissionType.Location => PermissionsHelperPlugin.PermissionType.PRLocationWhileUsingPermissions,
                 _ => throw new ArgumentOutOfRangeException(permissionType.ToString() + " not a proper type"),
             };
         }
