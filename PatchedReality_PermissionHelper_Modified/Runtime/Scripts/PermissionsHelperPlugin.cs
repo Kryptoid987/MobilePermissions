@@ -73,7 +73,7 @@ namespace MobilePermissions.iOS
                 return;
             }
             //note: same deal with motion usage
-            else if (permission.Equals(PermissionType.PRLocationWhileUsingPermissions))
+            else if (permission.Equals(PermissionType.PRMotionUsagePermissions))
             {
                 //var test = Input.acceleration.magnitude;
 
