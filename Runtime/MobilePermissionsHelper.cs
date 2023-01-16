@@ -134,8 +134,8 @@ namespace MobilePermissions
             callbacks.PermissionDeniedAndDontAskAgain += Callbacks_PermissionDeniedAndDontAskAgain;
             Permission.RequestUserPermission(GetAndroidPermissionString(permissionType), callbacks);
 #elif UNITY_IOS
-            PermissionsHelperPlugin.Instance.RequestPermission(GetiOSPermissionEnum(permissionType));
             PermissionsHelperPlugin.OnPermissionStatusUpdated += OniOSPermissionUpdated;
+            PermissionsHelperPlugin.Instance.RequestPermission(GetiOSPermissionEnum(permissionType));
 #else
             OnPermissionChangedCallback?.Invoke(AuthStatus.Unknown);
 #endif

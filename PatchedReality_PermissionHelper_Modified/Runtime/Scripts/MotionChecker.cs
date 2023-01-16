@@ -45,37 +45,35 @@ namespace MobilePermissions.iOS
                 yield break;
             }
 
+            //Get current motion permission status, return rigth away if authorized or denied
+            var currentPermissionStatus = PermissionsHelperPlugin.Instance.GetPermissionStatus(PermissionType.PRMotionUsagePermissions);
+            if(currentPermissionStatus == PermissionsHelperPlugin.PermissionStatus.PRPermissionStatusAuthorized)
+            {
+                successCallback?.Invoke(PermissionTypeAsString);
+                yield break;
+            }
+            else if(currentPermissionStatus == PermissionsHelperPlugin.PermissionStatus.PRPermissionStatusDenied || currentPermissionStatus == PermissionsHelperPlugin.PermissionStatus.PRPermissionStatusRestricted)
+            {
+                failureCallback?.Invoke(PermissionTypeAsString);
+                yield break;
+            }
+
             //Enable and check motion
             InputSystem.EnableDevice(StepCounter.current);
-            int maxWait = 20;
-            // Wait until service initializes - really? up to 20 seconds?
-            while (!StepCounter.current.IsActuated() && maxWait > 0)
+            int maxWait = 30;
+            while ((PermissionsHelperPlugin.Instance.GetPermissionStatus(PermissionType.PRMotionUsagePermissions) == PermissionsHelperPlugin.PermissionStatus.PRPermissionStatusUnknown ||
+                PermissionsHelperPlugin.Instance.GetPermissionStatus(PermissionType.PRMotionUsagePermissions) == PermissionsHelperPlugin.PermissionStatus.PRPermissionStatusUnknown) && maxWait > 0)
             {
                 yield return new WaitForSeconds(1);
                 maxWait--;
             }
 
-            // Service didn't initialize in 20 seconds
-            if (maxWait < 1)
-            {
-                Debug.Log("Took more than 20 seconds - assume failure...");
-                InputSystem.DisableDevice(StepCounter.current);
-                failureCallback?.Invoke(PermissionTypeAsString);
-                yield break;
-            }
-
-            bool haveServicePermissions = false;
-            if (StepCounter.current.IsActuated())
-            {
-                haveServicePermissions = true;
-            }
-
             //in any case, stop.
             InputSystem.DisableDevice(StepCounter.current);
 
-            if (haveServicePermissions)
+            if(PermissionsHelperPlugin.Instance.GetPermissionStatus(PermissionType.PRMotionUsagePermissions) == PermissionsHelperPlugin.PermissionStatus.PRPermissionStatusAuthorized)
             {
-                Debug.Log("Motion services started");
+                Debug.Log("Motion services authorized");
                 successCallback?.Invoke(PermissionTypeAsString);
             }
             else
