@@ -10,7 +10,9 @@
     }
   ],
   "unity": "2021.1",
-  "dependencies": {},
+  "dependencies": {
+	"com.unity.inputsystem": "1.0.0"
+},
   "keywords": [
     "mobile",
     "permissions"

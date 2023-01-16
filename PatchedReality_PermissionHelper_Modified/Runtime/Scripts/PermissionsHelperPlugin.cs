@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -74,8 +75,11 @@ namespace MobilePermissions.iOS
             //note: same deal with motion usage
             else if (permission.Equals(PermissionType.PRLocationWhileUsingPermissions))
             {
-                var test = Input.acceleration.magnitude;
+                //var test = Input.acceleration.magnitude;
 
+                //if stepcounter.current = null, not supported, return denied. Do error not supported
+
+                UnityEngine.InputSystem.InputSystem.EnableDevice(UnityEngine.InputSystem.StepCounter.current);
 
 
             }
