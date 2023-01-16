@@ -71,6 +71,14 @@ namespace MobilePermissions.iOS
                 RequestLocationPermissions();
                 return;
             }
+            //note: same deal with motion usage
+            else if (permission.Equals(PermissionType.PRLocationWhileUsingPermissions))
+            {
+
+
+
+
+            }
 
             _requestPermission((int)permission, this.gameObject.name, "PermissionRequestSuccess", "PermissionRequestFailure");
         }
@@ -100,6 +108,13 @@ namespace MobilePermissions.iOS
                 this.PermissionRequestSuccess(((int)PermissionType.PRLocationWhileUsingPermissions).ToString());
                 return;
             }
+
+            //Location servies only can be initiated with the old input system, we need to breifly turn on location services to force the location permission request prompt.
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+            Debug.LogError("New Input System currently cannot enable location services which is required to get the permission request prompt to actually show up for location. Returning failure.");
+            this.PermissionRequestFailure(((int)PermissionType.PRLocationWhileUsingPermissions).ToString());
+            return;
+#endif
 
             //otherwise, have our little location helper find out whats what.
             LocationHelper.RequestLocationPermissions(this.PermissionRequestSuccess, this.PermissionRequestFailure);

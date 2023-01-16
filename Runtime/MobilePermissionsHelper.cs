@@ -44,9 +44,10 @@ namespace MobilePermissions
         //Android permissions
         PermissionCallbacks callbacks;
 #endif
-        Action<AuthStatus> OnPermissionChangedCallback; 
+        private Action<AuthStatus> OnPermissionChangedCallback;
+        private bool isRequestingPermission = false;
 
-        public static AuthStatus HasPermission(PermissionType permission)
+        public AuthStatus HasPermission(PermissionType permission)
         {
 #if UNITY_ANDROID
             return Permission.HasUserAuthorizedPermission(GetAndroidPermissionString(permission)) ? AuthStatus.Authorized : AuthStatus.Denied;
@@ -70,7 +71,7 @@ namespace MobilePermissions
             return AuthStatus.Unknown;
 #endif
         }
-        public static void OpenAppSettings()
+        public void OpenAppSettings()
         {
 #if UNITY_ANDROID
             try
@@ -101,10 +102,24 @@ namespace MobilePermissions
             AppSettingsIOSNativeBindings.OpenSettings();
 #endif
         }
-        public void RequestAndroidPermission(PermissionType permissionType, Action<AuthStatus> OnPermissionChangedCallback)
+
+        /// <summary>
+        /// Returns false if a permission request is already in progress
+        /// </summary>
+        /// <param name="permissionType"></param>
+        /// <param name="OnPermissionChangedCallback"></param>
+        /// <returns></returns>
+        public bool RequestPermission(PermissionType permissionType, Action<AuthStatus> OnPermissionChangedCallback)
         {
+            if (isRequestingPermission)
+            {
+                Debug.LogWarning("Permission is currently already being requested.");
+                return false;
+            }
+
 #if UNITY_ANDROID || UNITY_IOS
             this.OnPermissionChangedCallback = OnPermissionChangedCallback;
+            isRequestingPermission = true;
 #endif
 
 #if UNITY_ANDROID
@@ -119,6 +134,7 @@ namespace MobilePermissions
 #else
             OnPermissionChangedCallback?.Invoke(AuthStatus.Unknown);
 #endif
+            return true;
         }
 
         #region Android
@@ -135,6 +151,7 @@ namespace MobilePermissions
         //Enable pedometer after being granted the proper android permissions
         private void Callbacks_AndroidPermissionGranted(string obj)
         {
+            isRequestingPermission = false;
             OnPermissionChangedCallback?.Invoke(AuthStatus.Authorized);
             UnsubAndroidCallbacks();
         }
@@ -142,12 +159,14 @@ namespace MobilePermissions
         //Log error and possibly react to needed permissions being denied;
         private void Callbacks_AndroidPermissionDenied(string obj)
         {
+            isRequestingPermission = false;
             OnPermissionChangedCallback?.Invoke(AuthStatus.Denied);
             UnsubAndroidCallbacks();
         }
 
         private void Callbacks_PermissionDeniedAndDontAskAgain(string obj)
         {
+            isRequestingPermission = false;
             OnPermissionChangedCallback?.Invoke(AuthStatus.DeniedForever);
             UnsubAndroidCallbacks();
         }
@@ -169,6 +188,7 @@ namespace MobilePermissions
         private void OniOSPermissionUpdated(PermissionsHelperPlugin.PermissionType permisson, bool success)
         {
             PermissionsHelperPlugin.OnPermissionStatusUpdated -= OniOSPermissionUpdated;
+            isRequestingPermission = false;
             OnPermissionChangedCallback?.Invoke(success ? AuthStatus.Authorized : AuthStatus.DeniedForever);
         }
 
