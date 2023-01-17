@@ -18,7 +18,7 @@ namespace MobilePermissions
         Camera,
         Microphone,
         Location,
-        Pedometer,
+        MotionUsage,
     }
 
     public enum AuthStatus
@@ -148,7 +148,7 @@ namespace MobilePermissions
             return type switch
             {
                 PermissionType.Camera => "android.permission.CAMERA",
-                PermissionType.Pedometer => "android.permission.ACTIVITY_RECOGNITION",
+                PermissionType.MotionUsage => "android.permission.ACTIVITY_RECOGNITION",
                 PermissionType.Microphone => "android.permission.RECORD_AUDIO",
                 PermissionType.Location => "android.permission.ACCESS_FINE_LOCATION",
                 _ => throw new ArgumentOutOfRangeException(type.ToString() + " not a proper type"),

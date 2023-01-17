@@ -9,3 +9,8 @@ Note: Basic permissions like camera do not need to be manually added to AndroidM
 
 -iOS must have permission strings set for permission requests to work.
 -Be sure to set Motion Usage to true in InputSystemPackages in settings if using new input system and require Motion Usage.
+
+WARNING:
+- to request location permission the old input system or 'both' must be enabled. There is currently no Input to enabled in the new input system that enables location services allowing us to force the request ahead of it actually being used.
+- to request motion usage the new input system or 'both' must be enabled. There is no Input AFAIK in the old input system that can be used to trigger the motion usage permission request ahead of time.
+*These permissions will still be requested by device on enabling something that uses location or motion providing the permission strings are set by external unity packages such as a AR SDK accessing fine location or a native plugin accessing devices pedometer directly.

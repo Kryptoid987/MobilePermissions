@@ -135,10 +135,18 @@ namespace MobilePermissions.iOS
                 //succeed immediately, they have already granted what we need.
                 this.PermissionRequestSuccess(((int)PermissionType.PRMotionUsagePermissions).ToString());
                 return;
-            }
+            }            
+
+            //We can only force the permission prompt for motion usage with the new input system, theres nothing to do it with with old input system AFAIK
+#if !ENABLE_INPUT_SYSTEM 
+            Debug.LogError("Old Input System does not have a Input to force the motion usage permission to show up.");
+            this.PermissionRequestFailure(((int)PermissionType.PRLocationWhileUsingPermissions).ToString());
+            return;
+#else
 
             //otherwise, have our little location helper find out whats what.
             MotionHelper.RequestMotionPermissions(this.PermissionRequestSuccess, this.PermissionRequestFailure);
+#endif
         }
 
         void PermissionRequestSuccess(string permissionType)
