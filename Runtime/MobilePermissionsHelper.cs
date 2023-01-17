@@ -43,16 +43,16 @@ namespace MobilePermissions
     // Requesting Permission on a dont allow, or dont allow forever state will still return 'Dont Allow' and 'Dont Allow Forever', use these
     //  accordingly to know how to react. AKA if its dont allow always we know the permission screen never showed up and the user needs to go to settings to allow
 
-    public class MobilePermissionsHelper : MonoBehaviour
+    public static class MobilePermissionsHelper
     {
 #if UNITY_ANDROID
         //Android permissions
-        PermissionCallbacks callbacks;
+        static PermissionCallbacks callbacks;
 #endif
-        private Action<AuthStatus> OnPermissionChangedCallback;
-        private bool isRequestingPermission = false;
+        static private Action<AuthStatus> OnPermissionChangedCallback;
+        static private bool isRequestingPermission = false;
 
-        public AuthStatus HasPermission(PermissionType permission)
+        public static AuthStatus HasPermission(PermissionType permission)
         {
 #if UNITY_ANDROID
             return Permission.HasUserAuthorizedPermission(GetAndroidPermissionString(permission)) ? AuthStatus.Authorized : AuthStatus.Denied;
@@ -76,7 +76,7 @@ namespace MobilePermissions
             return AuthStatus.Unknown;
 #endif
         }
-        public void OpenAppSettings()
+        public static void OpenAppSettings()
         {
 #if UNITY_ANDROID
             try
@@ -114,7 +114,7 @@ namespace MobilePermissions
         /// <param name="permissionType"></param>
         /// <param name="OnPermissionChangedCallback"></param>
         /// <returns></returns>
-        public bool RequestPermission(PermissionType permissionType, Action<AuthStatus> OnPermissionChangedCallback)
+        public static bool RequestPermission(PermissionType permissionType, Action<AuthStatus> OnPermissionChangedCallback)
         {
             if (isRequestingPermission)
             {
@@ -123,7 +123,7 @@ namespace MobilePermissions
             }
 
 #if UNITY_ANDROID || UNITY_IOS
-            this.OnPermissionChangedCallback = OnPermissionChangedCallback;
+            MobilePermissionsHelper.OnPermissionChangedCallback = OnPermissionChangedCallback;
             isRequestingPermission = true;
 #endif
 
@@ -156,7 +156,7 @@ namespace MobilePermissions
         }
 
         //Enable pedometer after being granted the proper android permissions
-        private void Callbacks_AndroidPermissionGranted(string obj)
+        private static void Callbacks_AndroidPermissionGranted(string obj)
         {
             isRequestingPermission = false;
             OnPermissionChangedCallback?.Invoke(AuthStatus.Authorized);
@@ -164,21 +164,21 @@ namespace MobilePermissions
         }
 
         //Log error and possibly react to needed permissions being denied;
-        private void Callbacks_AndroidPermissionDenied(string obj)
+        private static void Callbacks_AndroidPermissionDenied(string obj)
         {
             isRequestingPermission = false;
             OnPermissionChangedCallback?.Invoke(AuthStatus.Denied);
             UnsubAndroidCallbacks();
         }
 
-        private void Callbacks_PermissionDeniedAndDontAskAgain(string obj)
+        private static void Callbacks_PermissionDeniedAndDontAskAgain(string obj)
         {
             isRequestingPermission = false;
             OnPermissionChangedCallback?.Invoke(AuthStatus.DeniedForever);
             UnsubAndroidCallbacks();
         }
 
-        private void UnsubAndroidCallbacks()
+        private static void UnsubAndroidCallbacks()
         {
 #if UNITY_ANDROID
             if (callbacks != null)
@@ -186,14 +186,15 @@ namespace MobilePermissions
                 callbacks.PermissionGranted -= Callbacks_AndroidPermissionGranted;
                 callbacks.PermissionDenied -= Callbacks_AndroidPermissionDenied;
                 callbacks.PermissionDeniedAndDontAskAgain -= Callbacks_PermissionDeniedAndDontAskAgain;
+                callbacks = null;
             }
 #endif
         }
-#endregion
+        #endregion
 
         #region iOS
 #if UNITY_IOS
-        private void OniOSPermissionUpdated(PermissionsHelperPlugin.PermissionType permisson, bool success)
+        private static void OniOSPermissionUpdated(PermissionsHelperPlugin.PermissionType permisson, bool success)
         {
             PermissionsHelperPlugin.OnPermissionStatusUpdated -= OniOSPermissionUpdated;
             isRequestingPermission = false;
@@ -205,21 +206,13 @@ namespace MobilePermissions
             return permissionType switch
             {
                 PermissionType.Camera => PermissionsHelperPlugin.PermissionType.PRCameraPermissions,
-                PermissionType.Pedometer => PermissionsHelperPlugin.PermissionType.PRMotionUsagePermissions,
+                PermissionType.MotionUsage => PermissionsHelperPlugin.PermissionType.PRMotionUsagePermissions,
                 PermissionType.Microphone => PermissionsHelperPlugin.PermissionType.PRMicrophonePermissions,
                 PermissionType.Location => PermissionsHelperPlugin.PermissionType.PRLocationWhileUsingPermissions,
                 _ => throw new ArgumentOutOfRangeException(permissionType.ToString() + " not a proper type"),
             };
         }
 #endif
-#endregion
-
-        private void OnDestroy()
-        {
-            UnsubAndroidCallbacks();
-#if UNITY_IOS
-            PermissionsHelperPlugin.OnPermissionStatusUpdated -= OniOSPermissionUpdated;
-#endif
-        }
+        #endregion
     }
 }
