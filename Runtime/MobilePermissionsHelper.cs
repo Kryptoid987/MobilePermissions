@@ -55,7 +55,7 @@ namespace MobilePermissions
         public static AuthStatus HasPermission(PermissionType permission)
         {
 #if UNITY_ANDROID
-            return Permission.HasUserAuthorizedPermission(GetAndroidPermissionString(permission)) ? AuthStatus.Authorized : AuthStatus.Denied;
+            return Permission.HasUserAuthorizedPermission(GetAndroidPermissionString(permission)) ? AuthStatus.Authorized : AuthStatus.Unknown;
 #elif UNITY_IOS
             switch (PermissionsHelperPlugin.Instance.GetPermissionStatus(GetiOSPermissionEnum(permission)))
             {

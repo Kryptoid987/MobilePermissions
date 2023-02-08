@@ -1,6 +1,6 @@
 {
   "name": "com.kkg.mobilepermissions",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "displayName": "Mobile Permissions",
   "description": "A permission plugin to easily deal with Android and iOS permissions.",
   "contributors": [
