@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace MobilePermissions.iOS.Examples
 {
-
+    #if UNITY_IOS
     using PermissionType = PermissionsHelperPlugin.PermissionType;
     using PermissionStatus = PermissionsHelperPlugin.PermissionStatus;
+    #endif
 
     /**
     Utility UI to show status of a permission in associated ui text field.
@@ -16,6 +17,7 @@ namespace MobilePermissions.iOS.Examples
     {
         [SerializeField] protected PermissionType Permission;
 
+#if UNITY_IOS
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
@@ -32,11 +34,11 @@ namespace MobilePermissions.iOS.Examples
         {
             PermissionsHelperPlugin.OnPermissionStatusUpdated -= HandlePermissionRequestStatusChange;
         }
-
+#endif
         void OnApplicationFocus(bool hasFocus)
         {
             //ask plugin manager about our permissions, since it might have changed.
-            //TODO: This seems to trigger a crash when coming back from settings...but only when we have changed a status. 
+            //TODO: This seems to trigger a crash when coming back from settings...but only when we have changed a status.
             //Investigate!
             UpdateTextStatusFromPlugin();
         }
@@ -45,7 +47,7 @@ namespace MobilePermissions.iOS.Examples
         {
             if (permission.Equals(Permission))
             {
-                //query plugin to get actual status - really only needed when result is negative, 
+                //query plugin to get actual status - really only needed when result is negative,
                 //but cleaner to do it every time could be declined or restricted.
                 UpdateTextStatusFromPlugin();
             }
@@ -53,8 +55,10 @@ namespace MobilePermissions.iOS.Examples
 
         void UpdateTextStatusFromPlugin()
         {
+#if UNITY_IOS
             PermissionStatus status = PermissionsHelperPlugin.Instance.GetPermissionStatus(Permission);
             TextField.text = string.Format("{0}:\n{1}", Permission.ToString(), status.ToString());
+#endif
         }
 
         UnityEngine.UI.Text TextField

@@ -5,9 +5,11 @@ using UnityEngine.SceneManagement;
 
 namespace MobilePermissions.iOS.Examples
 {
+    #if UNITY_IOS
     using CollectiveState = CollectivePermissionsStatus.CollectiveState;
     using PermissionType = PermissionsHelperPlugin.PermissionType;
-    
+    #endif
+
     /*
         Put one of these in your "loading" scene. It will decide if it needs to go to the
         permission granting scene or your real app scene. Right now, it uses LoadScene
@@ -18,9 +20,10 @@ namespace MobilePermissions.iOS.Examples
     {
         [SerializeField] protected string PermissionsScene;
         [SerializeField] protected string MainScene;
-        
+
         [SerializeField] protected List< PermissionType> RequiredPermissions;
 
+        #if UNITY_IOS
         // Start is called before the first frame update
         void Awake()
         {
@@ -36,16 +39,17 @@ namespace MobilePermissions.iOS.Examples
             PermissionsHelperPlugin.Instance.SetRequiredPermissions(RequiredPermissions);
             var status = PermissionsHelperPlugin.Instance.GetCollectiveState();
             MobilePermissions.iOS.Examples.AllAtOncePermissionsButtonHandler.OnAllPermissionsAuthorized += ToMainScene;
-            
+
             if(status.Equals(CollectiveState.AllAuthorized))
             {
                 ToMainScene();
             }
-            else 
+            else
             {
                 ToPermissionsScene();
             }
         }
+        #endif
 
         void ToPermissionsScene()
         {

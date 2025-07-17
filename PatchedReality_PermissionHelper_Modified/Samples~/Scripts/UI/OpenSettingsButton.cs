@@ -15,9 +15,11 @@ namespace MobilePermissions.iOS.Examples
 
         void HandleButtonClick()
         {
+#if UNITY_IOS
             PermissionsHelperPlugin.Instance.OpenSettings();
+#endif
         }
-        
+
         UnityEngine.UI.Button Button
         {
             get

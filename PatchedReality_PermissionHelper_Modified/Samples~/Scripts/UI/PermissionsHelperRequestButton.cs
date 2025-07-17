@@ -5,9 +5,10 @@ using UnityEngine;
 
 namespace MobilePermissions.iOS.Examples
 {
+#if UNITY_IOS
     using PermissionType = PermissionsHelperPlugin.PermissionType;
     using PermissionStatus = PermissionsHelperPlugin.PermissionStatus;
-
+#endif
     [RequireComponent(typeof(UnityEngine.UI.Button))]
     public class PermissionsHelperRequestButton : MonoBehaviour
     {
@@ -23,6 +24,7 @@ namespace MobilePermissions.iOS.Examples
             Button.onClick.AddListener(HandleButtonClick);
         }
 
+#if UNITY_IOS
         void OnEnable()
         {
             PermissionsHelperPlugin.Instance.SetRequiredPermissions(new List<PermissionType> { PermissionType.PRSpeechRecognitionPermissions });
@@ -38,7 +40,7 @@ namespace MobilePermissions.iOS.Examples
         {
             PermissionsHelperPlugin.OnPermissionStatusUpdated -= HandlePermissionRequestStatusChange;
         }
-
+#endif
         void HandlePermissionRequestStatusChange(PermissionType permission, bool result)
         {
             Debug.Log(permission + "   " + result);
@@ -55,8 +57,10 @@ namespace MobilePermissions.iOS.Examples
 
         void HandleButtonClick()
         {
+#if UNITY_IOS
             PermissionsHelperPlugin.Instance.RequestPermission(this.Permission);
             //PermissionsHelperPlugin.Instance.
+#endif
         }
 
         UnityEngine.UI.Button Button

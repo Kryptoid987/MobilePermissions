@@ -5,14 +5,18 @@ using TMPro;
 
 namespace MobilePermissions.iOS.Examples
 {
+    #if UNITY_IOS
     using PermissionType = PermissionsHelperPlugin.PermissionType;
     using PermissionStatus = PermissionsHelperPlugin.PermissionStatus;
+    #endif
     public class OneLinePermissionStatusUI : MonoBehaviour
     {
         [System.Serializable]
         public class IconChoice
         {
+#if UNITY_IOS
             public List<PermissionStatus> ForStatuses;
+#endif
             public Sprite Visual;
 
             public Color Tint;
@@ -26,6 +30,8 @@ namespace MobilePermissions.iOS.Examples
         [SerializeField] protected GameObject RequestInProgressSymbol;
 
         [SerializeField] protected bool HideIconWhenStatusSet = true;
+
+#if UNITY_IOS
         /// <summary>
         /// This function is called when the object becomes enabled and active.
         /// </summary>
@@ -46,6 +52,7 @@ namespace MobilePermissions.iOS.Examples
             PermissionsHelperPlugin.OnPermissionStatusUpdated -= HandlePermissionChanged;
             PermissionsHelperPlugin.OnPermissionRequestStarted -= HandlePremissionRequestStarted;
         }
+#endif
 
         void HandlePremissionRequestStarted(PermissionType permission)
         {
@@ -70,6 +77,7 @@ namespace MobilePermissions.iOS.Examples
 
         void UpdateIcon()
         {
+#if UNITY_IOS
             //get status for our perm, and update icon accordingly.
             Debug.Log("in perms updated for perm: " + MyPermission.ToString());
             PermissionStatus status = PermissionsHelperPlugin.Instance.GetPermissionStatus(MyPermission);
@@ -94,9 +102,10 @@ namespace MobilePermissions.iOS.Examples
                     Icon.gameObject.SetActive(false);
                 }
             }
-
+#endif
         }
 
+#if UNITY_IOS
         IconChoice ChoiceForStatus(PermissionStatus status)
         {
             foreach (IconChoice choice in IconsForStatus)
@@ -109,6 +118,6 @@ namespace MobilePermissions.iOS.Examples
 
             return null;
         }
-
+#endif
     }
 }

@@ -5,12 +5,14 @@ using TMPro;
 
 namespace MobilePermissions.iOS.Examples
 {
+    #if UNITY_IOS
     using PermissionType = PermissionsHelperPlugin.PermissionType;
     using PermissionStatus = PermissionsHelperPlugin.PermissionStatus;
     using CollectiveState = CollectivePermissionsStatus.CollectiveState;
+    #endif
     /**
-        Control label and behaviour of the single button in the all at once UI.!-- 
-        Goal of this UI is as few clicks as possible. Thus a single button who's label changes based on 
+        Control label and behaviour of the single button in the all at once UI.!--
+        Goal of this UI is as few clicks as possible. Thus a single button who's label changes based on
         circumstances.
      */
 
@@ -45,7 +47,9 @@ namespace MobilePermissions.iOS.Examples
 
         protected ButtonContext context = ButtonContext.Beginning;
 
+        #if UNITY_IOS
         private SerialPermissionAuthSequence authSequence;
+        #endif
 
         /// <summary>
         /// Start is called on the frame when a script is enabled just before
@@ -62,6 +66,7 @@ namespace MobilePermissions.iOS.Examples
         /// </summary>
         void OnEnable()
         {
+            #if UNITY_IOS
             var state = PermissionsHelperPlugin.Instance.GetCollectiveState();
             MyButton.interactable = true;
             switch (state)
@@ -82,10 +87,12 @@ namespace MobilePermissions.iOS.Examples
                     }
             }
             UpdateLabel();
+            #endif
         }
 
         void HandleClick()
         {
+            #if UNITY_IOS
             //figure out what to do based on collective state and context.
             switch (context)
             {
@@ -123,21 +130,24 @@ namespace MobilePermissions.iOS.Examples
                         break;
                     }
             }
+            #endif
         }
 
         void HandleFlowDone()
         {
+            #if UNITY_IOS
             Debug.Log("Auth flow done!");
             ///when flow is done, go to the complete state, and update label.!--
             authSequence = null;
             MyButton.interactable = true;
             context = ButtonContext.Completed;
             UpdateLabel();
+            #endif
         }
 
         void UpdateLabel()
         {
-
+            #if UNITY_IOS
             CollectivePermissionsStatus.CollectiveState state = PermissionsHelperPlugin.Instance.GetCollectiveState();
             switch (context)
             {
@@ -146,13 +156,13 @@ namespace MobilePermissions.iOS.Examples
                     {
                         if (state == CollectiveState.AllAsked)
                         {
-                            //user is going to need to go to settings. 
+                            //user is going to need to go to settings.
                             Label.text = LabelNeedSettings;
                         }
                         else if (state == CollectiveState.AllUnknown ||
                                         state == CollectiveState.SomeUnknown)
                         {
-                            //there are at least some perms that need to/can be requested. 
+                            //there are at least some perms that need to/can be requested.
                             Label.text = LabelNeedAuth;
                         }
                         else
@@ -170,6 +180,7 @@ namespace MobilePermissions.iOS.Examples
                         break;
                     }
             }
+            #endif
         }
 
 
